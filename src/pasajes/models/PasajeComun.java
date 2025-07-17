@@ -1,26 +1,19 @@
 package pasajes.models;
 
-public class PasajeComun implements Pasaje {
+public class PasajeComun extends Pasaje implements Calculable {
 
-    private String nombrePasajero;
-    private VehiculoTransporte transporte;
-
-    public PasajeComun(String nombrePasajero, VehiculoTransporte transporte) {
-        this.nombrePasajero = nombrePasajero;
-        this.transporte = transporte;
-    }
-
-    public double calcularCostoFinal() {
-        return (transporte.capacidad * 2);
+    public PasajeComun(double costoBase, String nombrePasajero) {
+        super(costoBase, nombrePasajero);
     }
 
     @Override
-    public String getNombrePasajero() {
-        return nombrePasajero;
+    public double calcularCostoFinal() {
+        // El pasaje común paga el costo base completo
+        return getCostoBase();
     }
 
     @Override
     public String toString() {
-        return "Pasaje Comun - " + nombrePasajero + " - $" + calcularCostoFinal();
+        return "Pasaje Comun - " + getNombrePasajero() + " - $" + calcularCostoFinal();
     }
 }

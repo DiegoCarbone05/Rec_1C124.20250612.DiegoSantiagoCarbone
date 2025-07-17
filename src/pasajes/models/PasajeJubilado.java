@@ -1,26 +1,19 @@
 package pasajes.models;
 
-public class PasajeJubilado implements Pasaje {
-    private String nombrePasajero;
-    private VehiculoTransporte transporte;
+public class PasajeJubilado extends Pasaje implements Calculable {
 
-    public PasajeJubilado(String nombrePasajero, VehiculoTransporte transporte) {
-        this.nombrePasajero = nombrePasajero;
-        this.transporte = transporte;
+    public PasajeJubilado(double costoBase, String nombrePasajero) {
+        super(costoBase, nombrePasajero);
     }
 
     @Override
     public double calcularCostoFinal() {
-        return (transporte.capacidad * 2) * 0.25;
-    }
-
-    @Override
-    public String getNombrePasajero() {
-        return nombrePasajero;
+        // El pasaje de jubilado paga el 25% del costo base
+        return getCostoBase() * 0.25;
     }
 
     @Override
     public String toString() {
-        return "Pasaje Jubilado - " + nombrePasajero + " - $" + calcularCostoFinal();
+        return "Pasaje Jubilado - " + getNombrePasajero() + " - $" + calcularCostoFinal();
     }
 }

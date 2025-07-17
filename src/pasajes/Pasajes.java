@@ -21,8 +21,7 @@ public class Pasajes {
 
         do {
             mostrarMenu();
-            opcion = sc.nextInt();
-            sc.nextLine(); // limpiar
+            opcion = obtenerOpcionMenu();
 
             switch (opcion) {
                 case 1 -> registrarViaje();
@@ -50,78 +49,97 @@ public class Pasajes {
         System.out.print("Opción: ");
     }
 
-    public static void registrarViaje() {
+    public static int obtenerOpcionMenu() {
+        int opcion = -1;
+        boolean valido = false;
+        while (!valido) {
+            invalidValueDetector();
+            opcion = sc.nextInt();
+            sc.nextLine(); // limpiar buffer
+            if (opcion >= 0 && opcion <= 5) {
+                valido = true;
+            } else {
+                System.out.print("[ERROR] Ingrese una opción válida: ");
+            }
+        }
+        return opcion;
+    }
 
+    public static void registrarViaje() {
         //Nombre
         System.out.print("Nombre del pasajero: ");
         String nombre = sc.nextLine();
 
-        //------------------------------------------------------------------------------------Pasaje
-        int tipoPasaje;
-        System.out.print("Tipo de pasaje (1: Común, 2: Estudiante, 3: Jubilado): ");
-
-        //-----------------------VALIDATIONS
-        invalidValueDetector();
-        tipoPasaje = sc.nextInt();
-        while (tipoPasaje < 0 ||tipoPasaje > 4) {
-            System.out.print("[ERROR] Ingrese un numero valido: ");
-            tipoPasaje = sc.nextInt();
-        }
-
-
         //------------------------------------------------------------------------------------Transporte
         int transporte;
         System.out.print("Tipo de transporte (1: Colectivo, 2: Tren, 3: Subte): ");
-
-
-        //-----------------------VALIDATIONS
-        invalidValueDetector();
-        transporte = sc.nextInt();
-        while (transporte < 0 ||transporte > 4) {
-            System.out.print("[ERROR] Ingrese un numero valido: ");
-            transporte = sc.nextInt();
-        }
+        transporte = obtenerOpcionRango(1, 3);
 
         //------------------------------------------------------------------------------------Patente
         System.out.print("Ingrese patente de vehiculo: ");
         String patente = sc.nextLine();
+        if (patente.isEmpty()) {
+            patente = sc.nextLine(); // Por si quedó salto de línea pendiente
+        }
 
         //------------------------------------------------------------------------------------Capacidad
-        System.out.print("Ingrese capacidad: ");
-        invalidValueDetector();
-        int capacidad = sc.nextInt();
+        int capacidad = -1;
+        do {
+            System.out.print("Ingrese capacidad: ");
+            invalidValueDetector();
+            capacidad = sc.nextInt();
+            if (capacidad <= 0) {
+                System.out.println("[ERROR] La capacidad debe ser mayor a 0.");
+            }
+        } while (capacidad <= 0);
         sc.nextLine();
 
         //Empresa
         System.out.print("Ingrese empresa: ");
         String empresa = sc.nextLine();
 
-
         VehiculoTransporte vehiculo = null;
         switch (transporte) {
             case 1 -> vehiculo = new Colectivo(patente, capacidad, empresa);
             case 2 -> vehiculo = new Tren(patente, capacidad, empresa);
             case 3 -> vehiculo = new Subte(patente, capacidad, empresa);
-            default -> {
-                System.out.println("Tipo de vehiculo inválido.");
-            }
         }
+
+        //------------------------------------------------------------------------------------Pasaje
+        int tipoPasaje;
+        System.out.print("Tipo de pasaje (1: Común, 2: Estudiante, 3: Jubilado): ");
+        tipoPasaje = obtenerOpcionRango(1, 3);
+
+        // Calcular el costo base del vehículo
+        double costoBase = vehiculo.calcularCostoBase();
 
         Pasaje pasaje = null;
         switch (tipoPasaje) {
-            case 1 -> pasaje = new PasajeComun(nombre, vehiculo);
-            case 2 -> pasaje = new PasajeEstudiante(nombre, vehiculo);
-            case 3 -> pasaje = new PasajeJubilado(nombre, vehiculo);
-            default -> {
-                System.out.println("Tipo de pasaje inválido.");
-            }
+            case 1 -> pasaje = new PasajeComun(costoBase, nombre);
+            case 2 -> pasaje = new PasajeEstudiante(costoBase, nombre);
+            case 3 -> pasaje = new PasajeJubilado(costoBase, nombre);
         }
 
-        Viaje viaje = new Viaje(pasaje, vehiculo);
-        viajes.add(viaje);
-        System.out.println("Viaje registrado con éxito.");
+        // Validar duplicados antes de registrar el viaje
+        boolean duplicado = false;
+        for (Viaje v : viajes) {
+            if (v.getNombrePasajero().equalsIgnoreCase(nombre) && v.toString().contains(patente)) {
+                duplicado = true;
+                break;
+            }
+        }
+        if (duplicado) {
+            System.out.println("[ERROR] Ya existe un viaje con ese pasajero y patente.");
+            return;
+        }
 
-
+        if (vehiculo != null && pasaje != null) {
+            Viaje viaje = new Viaje(pasaje, vehiculo);
+            viajes.add(viaje);
+            System.out.println("Viaje registrado con éxito.");
+        } else {
+            System.out.println("No se pudo registrar el viaje por datos inválidos.");
+        }
     }
 
     public static void mostrarViajes() {
@@ -162,6 +180,23 @@ public class Pasajes {
             System.out.println("Entrada inválida. Ingrese un número entero:");
             sc.nextLine();
         }
+    }
+
+    // Nueva función para validar opciones en un rango específico
+    public static int obtenerOpcionRango(int min, int max) {
+        int opcion = -1;
+        boolean valido = false;
+        while (!valido) {
+            invalidValueDetector();
+            opcion = sc.nextInt();
+            sc.nextLine(); // limpiar buffer
+            if (opcion >= min && opcion <= max) {
+                valido = true;
+            } else {
+                System.out.print("[ERROR] Ingrese un número válido: ");
+            }
+        }
+        return opcion;
     }
 
 }

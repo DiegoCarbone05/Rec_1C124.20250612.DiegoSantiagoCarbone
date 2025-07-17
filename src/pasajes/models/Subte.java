@@ -8,7 +8,8 @@ public class Subte extends VehiculoTransporte {
 
     @Override
     public double calcularCostoBase() {
-        return 0;
+        // El costo base depende de la capacidad del subte
+        return getCapacidad() * 2;
     }
 
 

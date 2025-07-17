@@ -1,26 +1,19 @@
 package pasajes.models;
 
-public class PasajeEstudiante implements Pasaje {
-    private String nombrePasajero;
-    private VehiculoTransporte transporte;
+public class PasajeEstudiante extends Pasaje implements Calculable {
 
-    public PasajeEstudiante(String nombrePasajero, VehiculoTransporte transporte) {
-        this.nombrePasajero = nombrePasajero;
-        this.transporte = transporte;
+    public PasajeEstudiante(double costoBase, String nombrePasajero) {
+        super(costoBase, nombrePasajero);
     }
 
     @Override
     public double calcularCostoFinal() {
-        return (transporte.capacidad * 2) * 0.5;
-    }
-
-    @Override
-    public String getNombrePasajero() {
-        return nombrePasajero;
+        // El pasaje de estudiante paga el 50% del costo base
+        return getCostoBase() * 0.5;
     }
 
     @Override
     public String toString() {
-        return "Pasaje Estudiante - " + nombrePasajero + " - $" + calcularCostoFinal();
+        return "Pasaje Estudiante - " + getNombrePasajero() + " - $" + calcularCostoFinal();
     }
 }
